@@ -1,0 +1,24 @@
+
+.scrollable-table table {
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    border-collapse: collapse;
+}
+
+.scrollable-table table thead th {
+    background-color: white;
+    position: sticky;
+    top: 0;
+    font-size: 1.25rem;
+}
+
+.scrollable-table table tr td {
+    font-size: 15px;
+}
+
+.scrollable-table table thead {
+    border-bottom: 1px solid black; 
+    box-shadow: 0 1px 0 black; /* Simula uma borda inferior */
+}
+
