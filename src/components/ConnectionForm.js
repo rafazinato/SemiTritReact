@@ -42,7 +42,7 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData,setRealTi
   let lastValidData = null
   let updateTimer;
   let realTimeData = [], experimentData = [], derivativeData = []; // Data arrays
-  let buffer = ""
+  let buffer = []
   let volumeSum = 0, readCount = 0, experimentReadCount = 0; // Counters
   const toggleConnection = async () => {
     if (isConnected) {
@@ -77,12 +77,6 @@ const connect = async () => {
       updateReadInterval();
       // toggleButtonState(true);
   
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        const data = new TextDecoder().decode(value);
-        console.log(data); // Processar dados recebidos
-      }
     } catch (err) {
       console.error("Failed to connect:", err);
       alert("Failed to connect to the instrument.");
@@ -93,6 +87,10 @@ const disconnect = async () => {
   if (port) await port.close();
   setIsConnected(false);
 };
+
+
+// FUNÇÃO QUE FUNCIONA
+
 
   // Start reading data from the serial port
   function startSerialReading() {
@@ -105,20 +103,78 @@ const disconnect = async () => {
         const { value, done } = await reader.read(); // Read data from the port
         if (done) return; // Exit if reader is done
         buffer += new TextDecoder().decode(value); // Append new data to the buffer
-        console.log("Raw data received:", buffer.split(';'));
-        buffer = (buffer.split(';')).filter(item => item !== undefined)
-        console.log(buffer[4])
-        // let index;
-        // while ((index = buffer.indexOf('\r')) >= 0) { // Process each line of data
-        //   const dataStr = buffer.slice(0, index + 1).trim(); // Extract a single line of data
-        //   buffer = buffer.slice(index + 1); // Remove processed data from buffer
-        //   const parsedData = parseData(dataStr); // Parse the data
-        //   if (parsedData) lastValidData = parsedData; // Update last valid data
-        // }
-      } catch (err) {
+
+        
+        // console.log(buffer)
+
+        let index;
+        while ((index = buffer.indexOf("\r")) >= 0) {
+            // Process each line of data
+            const dataStr = buffer.slice(0, index + 1).trim(); // Extract a single line of data
+            buffer = buffer.slice(index + 1); // Remove processed data from buffer
+            dealDataStr(dataStr)
+            // console.log(buffer)
+            
+
+        }
+    } catch (err) {
         console.error("Failed to read data:", err);
-      }
     }
+  }
+
+  let data = [];
+    function dealDataStr(dataStr) {
+      if (deviceConfigs[instrument].name == "AS7341-FIA") {
+        dataStr = Number(dataStr.split(';'))
+        console.log(dataStr)
+      }
+
+    }
+
+    // let rawBuffer = '';
+    
+    // async function readSerialData() {
+    //   try {
+    //     while (true) {
+    //       const { value, done } = await reader.read();
+    //       if (done) {
+    //         console.log("Leitura concluída");
+    //         return;
+    //       }
+    
+    //       const chunk = new TextDecoder().decode(value);
+    //       rawBuffer += chunk;
+    //       console.log("Dado bruto recebido:", chunk);
+    
+    //       // Processa todos os valores completos (separados por ;)
+    //       let parts = rawBuffer.split(';');
+          
+    //       // Mantém o último fragmento incompleto no buffer
+    //       rawBuffer = parts.pop() || '';
+          
+    //       // Filtra valores vazios e converte para números
+    //       let values = parts.filter(val => val.trim() !== '').map(Number);
+          
+    //       // Adiciona os valores processados ao buffer
+    //       if (values.length > 0) {
+    //         buffer.push(...values);
+    //         console.log("Valores processados:", values);
+    //       }
+    
+    //       // Quando temos 10 valores, processamos como uma leitura completa
+    //       while (buffer.length >= 10) {
+    //         const reading = buffer.slice(0, 10);
+    //         buffer = buffer.slice(10);
+    //         console.log("Leitura completa (10 valores):", reading);
+    //         // Aqui você pode usar a leitura completa (10 valores)
+    //       }
+    //     }
+    //   } catch (err) {
+    //     console.error("Erro na leitura:", err);
+    //   }
+    // }
+    
+    // readSerialData().catch(console.error);
 
     // function parseData(dataStr) {
     //   const parts = dataStr.split(','); // Split data string into parts
