@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import ConnectionForm from './components/ConnectionForm';
 import RealTimeChart from './components/RealTimeChart';
 import ExperimentChart from './components/ExperimentChart';
@@ -11,6 +11,10 @@ function App() {
   const [realTimeData, setRealTimeData] = useState([]);
   const [experimentData, setExperimentData] = useState([]);
   const [derivativeData, setDerivativeData] = useState([]);
+  const [testData, setTestData] = useState([])
+  const [selectedWavelength, setSelectedWavelength ] = useState()
+  const [chartPoints, setChartsPoints] = useState(50)
+
 
   // Função para adicionar dados em tempo real
   const addRealTimeData = (data) => {
@@ -58,8 +62,8 @@ function App() {
   // function dealTableTest() {
   //   setRealTimeData([...realTimeData, {  Time: '10:00', Read: 1.2, pH: 7.0, Temperature: 25.0 }])
   // }
-  
-  console.log(realTimeData)
+  console.log(chartPoints)
+
   return (
     <div className="container-fluid">
       <header className="text-bg-primary text-center py-1 mb-2">
@@ -83,6 +87,13 @@ function App() {
               setIsConnected={setIsConnected}
               addRealTimeData={addRealTimeData}
               setRealTimeData={setRealTimeData}
+              setTestData={setTestData}
+              testData={testData}
+              selectedWavelength={selectedWavelength}
+              setSelectedWavelength={setSelectedWavelength}
+              chartPoints={chartPoints}
+              // startTime={startTime}
+              // setStartTime={setStartTime}
             />
           </div>
         </div>
@@ -90,16 +101,16 @@ function App() {
       <div className="graph-container">
         <div className="real-chart">
           <h5 className="text-center">Real-Time Data</h5>
-          <RealTimeChart data={realTimeData} />
+          <RealTimeChart data={realTimeData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints}/>
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
-                <label for="max-points" class="form-label mb-0">Chart Number of Points</label>
-                <input type="number" id="max-points" class="form-control" value="50"></input>
+                <label for="max-points" class="form-label mb-0" >Chart Number of Points</label>
+                <input type="number" id="max-points" class="form-control" onChange={(e) => setChartsPoints(e.target.value)}></input>
               </div>
             </div>
             <div class="col-md-4">
-              <button type="button" id="clear-data-button" class="btn btn-danger full-width-button" disabled>Clear Data</button>
+              <button type="button" id="clear-data-button" class="btn btn-danger full-width-button" onClick={() => setTestData([])}>Clear Data</button>
             </div>
           </div>
           <DataTable data={realTimeData} columns={['Time', 'Read', 'pH', 'Temperature']} />
@@ -122,7 +133,7 @@ function App() {
               </div>
             </div>
             <div class="col-md-4">
-              <button type="button" id="add-experiment-data-button" class="btn btn-primary full-width-button">Start</button>
+              <button type="button" id="add-experiment-data-button" class="btn btn-primary full-width-button" >Start</button>
             </div>
           </div>
           <DataTable data={experimentData} columns={['Time', 'Read', 'Volume', 'pH', 'Temperature']} />
