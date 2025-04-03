@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ConnectionForm from './components/ConnectionForm';
 import RealTimeChart from './components/RealTimeChart';
 import ExperimentChart from './components/ExperimentChart';
@@ -9,17 +9,21 @@ import './App.css';
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [realTimeData, setRealTimeData] = useState([]);
+  const [realTimeDataTable, setRealTimeDataTable] = useState([]);
   const [experimentData, setExperimentData] = useState([]);
   const [derivativeData, setDerivativeData] = useState([]);
   const [testData, setTestData] = useState([])
-  const [selectedWavelength, setSelectedWavelength ] = useState()
+  const [selectedWavelength, setSelectedWavelength] = useState()
   const [chartPoints, setChartsPoints] = useState(50)
+  const startTime = useRef(null)
+  const [filteredData, setFilteredData] = useState([]);
+
 
 
   // Função para adicionar dados em tempo real
-  const addRealTimeData = (data) => {
-    setRealTimeData((prevData) => [...prevData, data]);
-  };
+  // const addRealTimeData = (data) => {
+  //   setRealTimeData((prevData) => [...prevData, data]);
+  // };
 
   // Função para adicionar dados de experimento
   const addExperimentData = (data) => {
@@ -59,11 +63,16 @@ function App() {
     updateDerivativeData();
   }, [experimentData]);
 
+
   // function dealTableTest() {
   //   setRealTimeData([...realTimeData, {  Time: '10:00', Read: 1.2, pH: 7.0, Temperature: 25.0 }])
   // }
-  console.log(chartPoints)
 
+
+  function handleClearData() {
+    setTestData([])
+    startTime.current = Date.now()
+  }
   return (
     <div className="container-fluid">
       <header className="text-bg-primary text-center py-1 mb-2">
@@ -85,15 +94,20 @@ function App() {
             <ConnectionForm
               isConnected={isConnected}
               setIsConnected={setIsConnected}
-              addRealTimeData={addRealTimeData}
+              // addRealTimeData={addRealTimeData}
+              realTimeData = {realTimeData}
               setRealTimeData={setRealTimeData}
+              setRealTimeDataTable={setRealTimeDataTable}
               setTestData={setTestData}
               testData={testData}
               selectedWavelength={selectedWavelength}
               setSelectedWavelength={setSelectedWavelength}
               chartPoints={chartPoints}
-              // startTime={startTime}
-              // setStartTime={setStartTime}
+              startTime={startTime}
+              setFilteredData={setFilteredData}
+              filteredData={filteredData}
+
+
             />
           </div>
         </div>
@@ -101,7 +115,7 @@ function App() {
       <div className="graph-container">
         <div className="real-chart">
           <h5 className="text-center">Real-Time Data</h5>
-          <RealTimeChart data={realTimeData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints}/>
+          <RealTimeChart data={filteredData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
@@ -110,14 +124,14 @@ function App() {
               </div>
             </div>
             <div class="col-md-4">
-              <button type="button" id="clear-data-button" class="btn btn-danger full-width-button" onClick={() => setTestData([])}>Clear Data</button>
+              <button type="button" id="clear-data-button" class="btn btn-danger full-width-button" onClick={() => handleClearData()}>Clear Data</button>
             </div>
           </div>
-          <DataTable data={realTimeData} columns={['Time', 'Read', 'pH', 'Temperature']} />
+          <DataTable data={realTimeDataTable} columns={['Time', 'Read', 'Selecionado']} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
             onClick={() => downloadCSV(realTimeData, 'real-time_data.csv', ['Time', 'Read', 'pH', 'Temperature'])}
-            disabled={realTimeData.length === 0}
+            disabled={realTimeDataTable.length === 0}
           >
             Download Real-Time Data
           </button>
@@ -136,7 +150,7 @@ function App() {
               <button type="button" id="add-experiment-data-button" class="btn btn-primary full-width-button" >Start</button>
             </div>
           </div>
-          <DataTable data={experimentData} columns={['Time', 'Read', 'Volume', 'pH', 'Temperature']} />
+          <DataTable data={experimentData} columns={['Time', 'Read', 'Selecionado']} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
             onClick={() => downloadCSV(experimentData, 'experiment_data.csv', ['time', 'read', 'volume', 'pH', 'temperature'])}
@@ -147,7 +161,7 @@ function App() {
         </div>
         <div className="derivative-chart">
           <h5 className="text-center">Derivative</h5>
-          <div style={{justifyItems: 'center'}}>
+          <div style={{ justifyItems: 'center' }}>
             <DerivativeChart data={derivativeData} />
           </div>
 

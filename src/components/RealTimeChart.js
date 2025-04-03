@@ -8,7 +8,6 @@ function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
   // Efeito para inicializar e atualizar o gráfico
   useEffect(() => {
     const ctx = chartRef.current.getContext('2d');
-    console.log(testData)
     // Configuração do gráfico
     const config = {
       type: 'line', // Tipo de gráfico (linha)
@@ -17,7 +16,7 @@ function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
           {
             label: 'Tempo (s)', // Rótulo do dataset
             // data: data.map((d) => ({ x: d.read, y: d.pH })), // Dados do gráfico
-            data: testData.slice(-chartPoints),
+            data: data.slice(-chartPoints),
             borderColor: 'rgba(75, 192, 192, 1)', // Cor da linha
             backgroundColor: 'rgba(75, 192, 192, 0.2)', // Cor de fundo
             borderWidth: 1, // Espessura da linha
@@ -47,7 +46,7 @@ function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
             },
             title: {
               display: true,
-              text: 'Read Number', // Rótulo do eixo X
+              text: 'Tempo', // Rótulo do eixo X
               font: { size: 17 }
             },
           },

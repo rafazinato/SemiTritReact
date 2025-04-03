@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../form.css';
-function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealTimeData, setTestData, testData, selectedWavelength, setSelectedWavelength,chartPoints }) {
+function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealTimeData,realTimeData, setTestData, testData, selectedWavelength, setSelectedWavelength, chartPoints, startTime, setFilteredData, filteredData, setRealTimeDataTable }) {
   const [instrument, setInstrument] = useState('lucadema210');
   const [readInterval, setReadInterval] = useState(2000);
   const [port, setPort] = useState(null);
-  const startTime = useRef(null)
+  const [intervalState, setIntervalState] = useState(1000)
+
+  // const startTime = useRef(null)
   const deviceConfigs = {
     lucadema210: {
       name: "Lucadema - LUCA210 - Escala pH",
@@ -65,7 +67,7 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
       reader = port.readable.getReader();
       setIsConnected(true);
       startSerialReading();
-      updateReadInterval();
+      // updateReadInterval();
       // toggleButtonState(true);
 
     } catch (err) {
@@ -105,7 +107,6 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
 
       let index;
       while ((index = buffer.indexOf("\r")) >= 0) {
-        console.log(buffer)
         // Process each line of data
         const dataStr = buffer.slice(0, index + 1).trim(); // Extract a single line of data
         buffer = buffer.slice(index + 1); // Remove processed data from buffer
@@ -140,8 +141,11 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
       const currentStartTime = startTime; // Captura o valor mais recente
       // console.log(currentStartTime)
       const elapsedTime = currentStartTime ? Date.now() - currentStartTime.current : 0;
+
       // console.log(elapsedTime)
       setTestData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
+
+      setRealTimeData(prev => [...prev, { 'Time': (elapsedTime / 1000), 'Read': dataStr[selectedWavelength], 'Selecionado': 0 }])
 
 
 
@@ -151,8 +155,63 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
   }
 
   useEffect(() => {
+    if (!testData.length || !intervalState) {
+      setFilteredData([]);
+      return;
+    }
+
+    // 1. Cria uma cópia segura dos dados atuais
+    const currentData = [...testData];
+    const lastPoint = currentData[currentData.length - 1];
+
+    // 2. Calcula quantos intervalos completos se passaram
+    const totalIntervals = Math.floor(lastPoint.x / intervalState);
+
+    // 3. Para cada intervalo, encontra o ponto mais próximo
+    const result = [];
+    for (let i = 1; i <= totalIntervals; i++) {
+      const targetTime = i * intervalState;
+
+      // Encontra o primeiro ponto que ultrapassa o tempo alvo
+      const point = currentData.find(p => p.x >= targetTime);
+
+      if (point) {
+        result.push(point);
+      }
+    }
+
+    setFilteredData(result);
+
+  }, [testData, intervalState]);
+
+
+
+  useEffect(() => {
     console.log("testData updated:", testData);
-  }, [testData]);
+    console.log("filtered updated:", filteredData)
+
+
+  }, [testData, filteredData]);
+
+
+
+  // function filterData(data, interval) {
+  //     if (!data || data.length === 0 || !interval) return [];
+
+  //     const result = [];
+  //     let nextIntervalPoint = interval; // Start with the first interval
+
+  //     // Find the first data point after the first interval
+  //     for (let i = 0; i < data.length; i++) {
+  //       if (data[i].x>= nextIntervalPoint) {
+  //         result.push(data[i]);
+  //         nextIntervalPoint += interval; // Move to next interval
+  //       }
+  //     }
+
+  //     return result;
+  //   }
+
 
   // useEffect(() => {
   //   setTestData(testData.slice(-chartPoints))
@@ -221,13 +280,13 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
   //   return { pH, temperature }; // Return parsed data
   // }
 
-  function updateReadInterval() {
-    clearInterval(updateTimer); // Clear any existing update timer
-    const readInterval = parseInt(readInterval); // Get selected interval
-    updateTimer = setInterval(updateRealTimeData, readInterval); // Set a new interval
-    updateRealTimeData(); // Update real-time data immediately
+  // function updateReadInterval() {
+  //   clearInterval(updateTimer); // Clear any existing update timer
+  //   const readInterval = parseInt(readInterval); // Get selected interval
+  //   updateTimer = setInterval(updateRealTimeData, readInterval); // Set a new interval
+  //   updateRealTimeData(); // Update real-time data immediately
 
-  }
+  // }
 
   function updateRealTimeData() {
     if (!lastValidData) return; // Exit if no valid data available
@@ -280,10 +339,12 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
               <select
                 id="read-interval"
                 className="form-select"
-                value={readInterval}
-                onChange={(e) => setReadInterval(e.target.value)}
+                // value={readInterval}
+                onChange={(e) => setIntervalState(e.target.value)}
               >
+                <option value="1000">Every second</option>
                 <option value="2000">Every 2 seconds</option>
+
                 <option value="5000">Every 5 seconds</option>
                 <option value="10000">Every 10 seconds</option>
                 <option value="30000">Every 30 seconds</option>
