@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../form.css';
-function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealTimeData,realTimeData, setTestData, testData, selectedWavelength, setSelectedWavelength, chartPoints, startTime, setFilteredData, filteredData, setRealTimeDataTable }) {
+function ConnectionForm({ isConnected, setIsConnected, 
+  addRealTimeData, setRealTimeData,realTimeData, setTestData, 
+  testData, selectedWavelength, setSelectedWavelength, chartPoints, 
+  startTime, setFilteredData, filteredData, setRealTimeDataTable }) {
   const [instrument, setInstrument] = useState('lucadema210');
   const [readInterval, setReadInterval] = useState(2000);
   const [port, setPort] = useState(null);
@@ -41,7 +44,7 @@ function ConnectionForm({ isConnected, setIsConnected, addRealTimeData, setRealT
   let reader;
   let lastValidData = null
   let updateTimer;
-  let realTimeData = [], experimentData = [], derivativeData = []; // Data arrays
+ let experimentData = [], derivativeData = []; // Data arrays
   let buffer = [];
   let volumeSum = 0, readCount = 0, experimentReadCount = 0; // Counters
   const toggleConnection = async () => {
