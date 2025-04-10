@@ -18,7 +18,18 @@ function App() {
   const startTime = useRef(null)
   const [filteredData, setFilteredData] = useState([]);
 
+  // States que serão utlizados para estocar arrays do volume e concentração 
 
+  const [aditionVolume, setAditionVolume] = useState([])
+  const [aditionConc, setAditionConc] = useState([])
+
+  const [lastAditionVolume, setLastAditionVolume] = useState()
+  const [lastAditionConc, setlastAditionConc] = useState()
+  const [maxPoint, setMaxPoint] = useState()
+  const [maxPointArray, setMaxPointArray] = useState([])
+
+  const addTime = useRef(null)
+  const [addTimeArray, setAddTimeArray] = useState([])
 
   // Função para adicionar dados em tempo real
   // const addRealTimeData = (data) => {
@@ -63,14 +74,114 @@ function App() {
     updateDerivativeData();
   }, [experimentData]);
 
+  useEffect(() => {
+    setRealTimeDataTable(filteredData.map((e) => ({ 'Time': (e.x / 1000).toFixed(1), 'Read': e.y, 'Selecionado': 0 })))
+  }, [filteredData]);
+
+
+
+
+  useEffect(() => {
+
+    // if ( addTimeArray[-2] < addTimeArray[-1] ) {
+    //   setMaxPoints([...maxPoints, Math.max(...filteredData.map(o => o.y))])
+
+    // // }
+
+    // const maxTimestamp = Math.max(...addTimeArray);
+    // let biggertimes = filteredData.filter(e => e.x > maxTimestamp);
+
+    // console.log(biggertimes)
+
+    if (addTimeArray.length === 0) return;
+    const lastTime = addTimeArray[addTimeArray.length - 1];
+
+    const newDataAfterClick = filteredData.filter(point => point.x >= (lastTime - startTime.current));
+    // const teste = filteredData.filter(point => point.x);
+
+    
+
+    setMaxPoint(Math.max(...newDataAfterClick.map(o => o.y)))
+
+
+    // console.log(lastTime - startTime.current)
+    // console.log(addTimeArray)
+    // console.log(newDataAfterClick)
+
+
+
+
+
+  }, [addTimeArray, filteredData]);
+
+
+  useEffect(() => {
+    let dataInTime; 
+    addTimeArray.forEach((e, idx) => {
+      // if (addTimeArray[idx - 1 ] === undefined) {
+      //   console.log('a')
+      //   //  dataInTime = filteredData.filter( point => point.x >=  e - startTime.current )
+      //   //  setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
+      // } else {
+      //   dataInTime = filteredData.filter( point => point.x <=  e - startTime.current && point.x >= addTimeArray[idx-1]  - startTime.current)
+      //   console.log(dataInTime)
+      //   setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
+      // }
+      
+      dataInTime = filteredData.filter( point => point.x <=  e - startTime.current && point.x >= addTimeArray[idx-1]  - startTime.current)
+      // console.log(dataInTime)
+      // setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
+
+
+      if (dataInTime.length !== 0) {
+        const max = dataInTime.reduce(function(prev, current) {
+          return (prev && prev.y > current.y) ? prev : current
+        }) //returns object
+
+        const aa = [...maxPointArray, max]
+
+        const uniqueArray = aa.reduce((acc, current) => {
+          const exists = acc.some(item => item.x === current.x && item.y === current.y);
+          return exists ? acc : [...acc, current];
+        }, []);
+
+        setMaxPointArray(uniqueArray)
+
+      }
+
+  
+  
+      });
+
+      
+    // setMaxPointArray([...maxPointArray, maxPoint ])
+    console.log(maxPointArray)
+  }, [maxPoint,addTimeArray,filteredData]);
+
+
+
+  // console.log(addTimeArray)
+  // console.log(maxPoints)
+
 
   // function dealTableTest() {
   //   setRealTimeData([...realTimeData, {  Time: '10:00', Read: 1.2, pH: 7.0, Temperature: 25.0 }])
   // }
 
+  function handleAddButton() {
+    setAditionConc([...aditionConc, lastAditionConc])
+    setAditionVolume([...aditionVolume, lastAditionVolume])
+    setAddTimeArray(prev => [...prev, Date.now()]);
+    addTime.current = Date.now()
+  }
+
+
 
   function handleClearData() {
     setTestData([])
+    setFilteredData([])
+    setRealTimeData([])
+    setRealTimeDataTable([])
     startTime.current = Date.now()
   }
   return (
@@ -95,7 +206,7 @@ function App() {
               isConnected={isConnected}
               setIsConnected={setIsConnected}
               // addRealTimeData={addRealTimeData}
-              realTimeData = {realTimeData}
+              realTimeData={realTimeData}
               setRealTimeData={setRealTimeData}
               setRealTimeDataTable={setRealTimeDataTable}
               setTestData={setTestData}
@@ -130,30 +241,33 @@ function App() {
           <DataTable data={realTimeDataTable} columns={['Time', 'Read', 'Selecionado']} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
-            onClick={() => downloadCSV(realTimeData, 'real-time_data.csv', ['Time', 'Read', 'pH', 'Temperature'])}
+            onClick={() => downloadCSV(realTimeDataTable, 'real-time_data.csv', ['Time', 'Read', 'Selecionado'])}
             disabled={realTimeDataTable.length === 0}
           >
             Download Real-Time Data
           </button>
         </div>
         <div className="experiment-chart">
-          <h5 className="text-center">Titration Data</h5>
+          <h5 className="text-center">Curva analítica</h5>
           <ExperimentChart data={experimentData} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
-                <label for="volume" class="form-label mb-0">Addition Volume (µl)</label>
-                <input type="number" id="volume" class="form-control" value="100"></input>
+                <label for="volume" class="form-label mb-0" >Addition Volume (µl)</label>
+                <input type="number" id="volume" class="form-control" onChange={(e) => setLastAditionVolume(e.target.value)} ></input>
+                <label for="volume" class="form-label mb-0">Concentração</label>
+                <input type="number" id="conc" class="form-control" onChange={(e) => setlastAditionConc(e.target.value)}></input>
+                <div class="col-md-4">
+                  <button type="button" id="add-experiment-data-button" class="btn btn-primary full-width-button" onClick={() => handleAddButton()} >Adicionar</button>
+                </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <button type="button" id="add-experiment-data-button" class="btn btn-primary full-width-button" >Start</button>
-            </div>
           </div>
-          <DataTable data={experimentData} columns={['Time', 'Read', 'Selecionado']} />
+
+          <DataTable data={experimentData} columns={['Concentração', 'Volume', 'Read']} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
-            onClick={() => downloadCSV(experimentData, 'experiment_data.csv', ['time', 'read', 'volume', 'pH', 'temperature'])}
+            onClick={() => downloadCSV(experimentData, 'experiment_data.csv', ['Concentração', 'Volume', 'Read'])}
             disabled={experimentData.length === 0}
           >
             Download Experiment Data

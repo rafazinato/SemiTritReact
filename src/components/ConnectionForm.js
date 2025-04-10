@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../form.css';
-function ConnectionForm({ isConnected, setIsConnected, 
-  addRealTimeData, setRealTimeData,realTimeData, setTestData, 
-  testData, selectedWavelength, setSelectedWavelength, chartPoints, 
+function ConnectionForm({ isConnected, setIsConnected,
+  addRealTimeData, setRealTimeData, realTimeData, setTestData,
+  testData, selectedWavelength, setSelectedWavelength, chartPoints,
   startTime, setFilteredData, filteredData, setRealTimeDataTable }) {
   const [instrument, setInstrument] = useState('lucadema210');
   const [readInterval, setReadInterval] = useState(2000);
@@ -44,7 +44,7 @@ function ConnectionForm({ isConnected, setIsConnected,
   let reader;
   let lastValidData = null
   let updateTimer;
- let experimentData = [], derivativeData = []; // Data arrays
+  let experimentData = [], derivativeData = []; // Data arrays
   let buffer = [];
   let volumeSum = 0, readCount = 0, experimentReadCount = 0; // Counters
   const toggleConnection = async () => {
@@ -146,9 +146,9 @@ function ConnectionForm({ isConnected, setIsConnected,
       const elapsedTime = currentStartTime ? Date.now() - currentStartTime.current : 0;
 
       // console.log(elapsedTime)
-      setTestData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
+      setRealTimeData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
 
-      setRealTimeData(prev => [...prev, { 'Time': (elapsedTime / 1000), 'Read': dataStr[selectedWavelength], 'Selecionado': 0 }])
+      // setRealTimeDataTable(prev => [...prev, { 'Time': (elapsedTime / 1000), 'Read': dataStr[selectedWavelength], 'Selecionado': 0 }])
 
 
 
@@ -158,13 +158,13 @@ function ConnectionForm({ isConnected, setIsConnected,
   }
 
   useEffect(() => {
-    if (!testData.length || !intervalState) {
+    if (!realTimeData.length || !intervalState) {
       setFilteredData([]);
       return;
     }
 
     // 1. Cria uma cópia segura dos dados atuais
-    const currentData = [...testData];
+    const currentData = [...realTimeData];
     const lastPoint = currentData[currentData.length - 1];
 
     // 2. Calcula quantos intervalos completos se passaram
@@ -185,18 +185,27 @@ function ConnectionForm({ isConnected, setIsConnected,
 
     setFilteredData(result);
 
-  }, [testData, intervalState]);
+
+
+  }, [realTimeData, intervalState]);
 
 
 
-  useEffect(() => {
-    console.log("testData updated:", testData);
-    console.log("filtered updated:", filteredData)
+  // useEffect(() => {
+  //   console.log("realTimeData updated:", realTimeData);
+  //   console.log("filtered updated:", filteredData)
 
 
-  }, [testData, filteredData]);
+  // }, [realTimeData, filteredData]);
 
 
+  function handleExperimentStart() {
+    setRealTimeData([])
+    setFilteredData([])
+    setRealTimeDataTable([])
+    startTime.current = 0
+
+  }
 
   // function filterData(data, interval) {
   //     if (!data || data.length === 0 || !interval) return [];
@@ -345,9 +354,9 @@ function ConnectionForm({ isConnected, setIsConnected,
                 // value={readInterval}
                 onChange={(e) => setIntervalState(e.target.value)}
               >
+                <option value="500">Every 500ms</option>
                 <option value="1000">Every second</option>
                 <option value="2000">Every 2 seconds</option>
-
                 <option value="5000">Every 5 seconds</option>
                 <option value="10000">Every 10 seconds</option>
                 <option value="30000">Every 30 seconds</option>
@@ -383,6 +392,15 @@ function ConnectionForm({ isConnected, setIsConnected,
           <option value='6'>630nm</option>
           <option value='8'>NIR</option>
         </select>
+        {/* <button
+                type="button"
+                onClick={() => handleExperimentStart()}
+              // onClick={
+              //   toggleConnection
+              // }
+              >
+                Começar
+              </button> */}
       </div>
     </>
   );

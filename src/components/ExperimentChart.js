@@ -26,8 +26,8 @@ function ExperimentChart({ data }) {
           }
         },
         scales: {
-          x: { title: { display: true, text: 'Volume (µl)',font: { size: 17} },  },
-          y: { title: { display: true, text: 'pH Value',font: { size: 17} },  },
+          x: { title: { display: true, text: 'Volume',font: { size: 17} },  },
+          y: { title: { display: true, text: 'Sinal',font: { size: 17} },  },
         },
       },
     });
