@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
 
-function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
+function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints,axis }) {
   const chartRef = useRef(null); // Referência para o elemento canvas
   const chartInstance = useRef(null); // Referência para a instância do gráfico
 
@@ -32,6 +32,7 @@ function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
         scales: {
           x: {
             type: 'linear', // Eixo X linear
+            
             // time: {
             //   unit: 'second',
             //   tooltipFormat: 'HH:mm:ss', // Formato do tooltip
@@ -51,6 +52,8 @@ function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
             },
           },
           y: {
+            min: axis[0],
+            max: axis[1],
             title: {
               display: true,
               text: 'Leitura/ bits', // Rótulo do eixo Y
@@ -89,7 +92,7 @@ function RealTimeChart({ data, testData, setSelectedWavelength,chartPoints }) {
 
   // ADC0/F1 415nm 445nm  480nm   515nm  555nm 590nm 630nm Clear NIR explique isso
   return (
-    <div style={{ height: '430px' }} >
+    <div style={{ height: '350px' }} >
  
       {/* style={{height: '30%' , width : '40%', display: 'block', boxSizing:' border-box' }} */}
       <canvas ref={chartRef} />

@@ -1,8 +1,8 @@
 /* Estilos para o container e título */
 div h3 {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
   
   /* Estilos para o formulário */
@@ -62,7 +62,7 @@ div h3 {
   /* Estilos para labels */
   .form-label {
     margin-bottom: 0;
-    font-size: 0.875rem;
+    font-size: 0.7rem;
     font-weight: 500;
   }
   
@@ -71,7 +71,7 @@ div h3 {
     display: block;
     width: 100%;
     padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 400;
     line-height: 1.5;
     color: #212529;
@@ -131,4 +131,37 @@ div h3 {
   
   .full-width-button {
     width: 100%;
+  }
+
+  .width50 {
+    width: 40%;
+  }
+
+
+  .input-container {
+    display: flex;
+    /* align-items: center;
+    align-content: center; */
+    gap: 2rem;
+  }
+  h2 {
+    font-size: 1rem;
+  }
+
+
+  .input-axis {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    appearance: none;
   }

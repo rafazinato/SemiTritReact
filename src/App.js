@@ -10,6 +10,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [realTimeData, setRealTimeData] = useState([]);
   const [realTimeDataTable, setRealTimeDataTable] = useState([]);
+  const [experimentDataTable, setExperimentDataTable] = useState([]);
   const [experimentData, setExperimentData] = useState([]);
   const [derivativeData, setDerivativeData] = useState([]);
   const [testData, setTestData] = useState([])
@@ -18,13 +19,26 @@ function App() {
   const startTime = useRef(null)
   const [filteredData, setFilteredData] = useState([]);
 
+  // State que controlará mínimo e máximo do gráfico Real
+
+  const [axis, setAxis] = useState([0,65000]);
+
+  // State que controlará o aparecimento das instruções
+
+  const [showInstruction, setShowInstruction] = useState(false);
+  const [textInstruction, setTextInstruction] = useState('Mostrar instruções');
+
   // States que serão utlizados para estocar arrays do volume e concentração 
 
   const [aditionVolume, setAditionVolume] = useState([])
   const [aditionConc, setAditionConc] = useState([])
+  const [labelTable, setLabelText] = useState([])
+
 
   const [lastAditionVolume, setLastAditionVolume] = useState()
   const [lastAditionConc, setlastAditionConc] = useState()
+  const [lastLabelTable, setLastLabelText] = useState()
+
   const [maxPoint, setMaxPoint] = useState()
   const [maxPointArray, setMaxPointArray] = useState([])
 
@@ -78,6 +92,9 @@ function App() {
     setRealTimeDataTable(filteredData.map((e) => ({ 'Time': (e.x / 1000).toFixed(1), 'Read': e.y, 'Selecionado': 0 })))
   }, [filteredData]);
 
+  useEffect(() => {
+    setExperimentDataTable(maxPointArray.map((e, idx) => ({ 'Nome': labelTable[idx], 'Read': e.y, })))
+  }, [maxPointArray]);
 
 
 
@@ -99,7 +116,7 @@ function App() {
     const newDataAfterClick = filteredData.filter(point => point.x >= (lastTime - startTime.current));
     // const teste = filteredData.filter(point => point.x);
 
-    
+
 
     setMaxPoint(Math.max(...newDataAfterClick.map(o => o.y)))
 
@@ -116,7 +133,7 @@ function App() {
 
 
   useEffect(() => {
-    let dataInTime; 
+    let dataInTime;
     addTimeArray.forEach((e, idx) => {
       // if (addTimeArray[idx - 1 ] === undefined) {
       //   console.log('a')
@@ -127,14 +144,21 @@ function App() {
       //   console.log(dataInTime)
       //   setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
       // }
-      
-      dataInTime = filteredData.filter( point => point.x <=  e - startTime.current && point.x >= addTimeArray[idx-1]  - startTime.current)
+      if (addTimeArray.length === 1) {
+        dataInTime = filteredData.filter(point => point.x <= e - startTime.current)
+
+      } else {
+
+        dataInTime = filteredData.filter(point => point.x <= e - startTime.current && point.x >= addTimeArray[idx - 1] - startTime.current)
+
+      }
+      // dataInTime = filteredData.filter( point => point.x <=  e - startTime.current && point.x >= addTimeArray[idx-1]  - startTime.current)
       // console.log(dataInTime)
       // setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
 
 
       if (dataInTime.length !== 0) {
-        const max = dataInTime.reduce(function(prev, current) {
+        const max = dataInTime.reduce(function (prev, current) {
           return (prev && prev.y > current.y) ? prev : current
         }) //returns object
 
@@ -149,17 +173,17 @@ function App() {
 
       }
 
-  
-  
-      });
 
-      
+
+    });
+
+
     // setMaxPointArray([...maxPointArray, maxPoint ])
     console.log(maxPointArray)
-  }, [maxPoint,addTimeArray,filteredData]);
+  }, [maxPoint, addTimeArray, filteredData]);
 
 
-
+  console.log(labelTable)
   // console.log(addTimeArray)
   // console.log(maxPoints)
 
@@ -171,6 +195,7 @@ function App() {
   function handleAddButton() {
     setAditionConc([...aditionConc, lastAditionConc])
     setAditionVolume([...aditionVolume, lastAditionVolume])
+    setLabelText([...labelTable, lastLabelTable])
     setAddTimeArray(prev => [...prev, Date.now()]);
     addTime.current = Date.now()
   }
@@ -184,6 +209,21 @@ function App() {
     setRealTimeDataTable([])
     startTime.current = Date.now()
   }
+
+  console.log(axis)
+  function handleInstruction() {
+    
+    return (
+      <>
+        <p class="mb-3 text-center">This page is designed for acquiring data from lab instruments via RS232/USB ports. While it is primarily intended for titration data acquisition, it can also be used for other types of data collection.        </p>
+        <p class=" my-1 ">1) Ensure your lab instrument is connected to your computer's USB port.</p>
+        <p class=" my-1">2) Choose the appropriate instrument profile from the dropdown menu.</p>
+        <p class=" my-1">3) Click the <strong>Connect</strong> button to establish a connection with the instrument.</p>
+        <p class=" my-1">4) Define the Volume aliquot and Click <strong>Start</strong> to start the experiment.</p>
+        <p class=" my-1">5) Press the <strong>Add</strong> button to record the data point.</p>
+      </>
+    );
+  }
   return (
     <div className="container-fluid">
       <header className="text-bg-primary text-center py-1 mb-2">
@@ -192,15 +232,7 @@ function App() {
 
       <div className="row mb-2 g-2">
         <div className='menu-container'>
-          <div class="col-md-5 mb-3 instructions">
-            <h5 class="text-center">Instructions for Data Acquisition from Lab Instrumentation</h5>
-            <p class="mb-3">This page is designed for acquiring data from lab instruments via RS232/USB ports. While it is primarily intended for titration data acquisition, it can also be used for other types of data collection.        </p>
-            <p class=" my-1">1) Ensure your lab instrument is connected to your computer's USB port.</p>
-            <p class=" my-1">2) Choose the appropriate instrument profile from the dropdown menu.</p>
-            <p class=" my-1">3) Click the <strong>Connect</strong> button to establish a connection with the instrument.</p>
-            <p class=" my-1">4) Define the Volume aliquot and Click <strong>Start</strong> to start the experiment.</p>
-            <p class=" my-1">5) Press the <strong>Add</strong> button to record the data point.</p>
-          </div>
+         
           <div className="col-md-7">
             <ConnectionForm
               isConnected={isConnected}
@@ -217,16 +249,23 @@ function App() {
               startTime={startTime}
               setFilteredData={setFilteredData}
               filteredData={filteredData}
+              setAxis={setAxis}
+              axis={axis}
 
 
             />
+
+          </div>
+          <div class="col-md-5 mb-3 instructions">
+            <h5 class="text-center"><button class='btn btn-info' onClick={() => setShowInstruction(!showInstruction)}>Instructions for Data Acquisition from Lab Instrumentation</button></h5>
+              {showInstruction ? handleInstruction() : null }
           </div>
         </div>
       </div>
       <div className="graph-container">
         <div className="real-chart">
           <h5 className="text-center">Real-Time Data</h5>
-          <RealTimeChart data={filteredData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints} />
+          <RealTimeChart data={filteredData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints} axis={axis} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
@@ -253,10 +292,13 @@ function App() {
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
-                <label for="volume" class="form-label mb-0" >Addition Volume (µl)</label>
+                <label for="volume" class="form-label mb-0" >Texto</label>
+                <input id="label-table" class="form-control" onChange={(e) => (setLastLabelText(e.target.value))} ></input>
+                {/* Tirando os inputs de concentração e volume por enquanto */}
+                {/* <label for="volume" class="form-label mb-0" >Addition Volume (µl)</label>
                 <input type="number" id="volume" class="form-control" onChange={(e) => setLastAditionVolume(e.target.value)} ></input>
                 <label for="volume" class="form-label mb-0">Concentração</label>
-                <input type="number" id="conc" class="form-control" onChange={(e) => setlastAditionConc(e.target.value)}></input>
+                <input type="number" id="conc" class="form-control" onChange={(e) => setlastAditionConc(e.target.value)}></input> */}
                 <div class="col-md-4">
                   <button type="button" id="add-experiment-data-button" class="btn btn-primary full-width-button" onClick={() => handleAddButton()} >Adicionar</button>
                 </div>
@@ -264,11 +306,11 @@ function App() {
             </div>
           </div>
 
-          <DataTable data={experimentData} columns={['Concentração', 'Volume', 'Read']} />
+          <DataTable data={experimentDataTable} columns={["Nome", 'Read']} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
-            onClick={() => downloadCSV(experimentData, 'experiment_data.csv', ['Concentração', 'Volume', 'Read'])}
-            disabled={experimentData.length === 0}
+            onClick={() => downloadCSV(experimentDataTable, 'experiment_data.csv', ["Nome", 'Read'])}
+            disabled={experimentDataTable.length === 0}
           >
             Download Experiment Data
           </button>

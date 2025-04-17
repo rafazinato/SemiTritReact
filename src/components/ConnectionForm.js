@@ -3,7 +3,7 @@ import '../form.css';
 function ConnectionForm({ isConnected, setIsConnected,
   addRealTimeData, setRealTimeData, realTimeData, setTestData,
   testData, selectedWavelength, setSelectedWavelength, chartPoints,
-  startTime, setFilteredData, filteredData, setRealTimeDataTable }) {
+  startTime, setFilteredData, filteredData, setRealTimeDataTable,setAxis,axis }) {
   const [instrument, setInstrument] = useState('lucadema210');
   const [readInterval, setReadInterval] = useState(2000);
   const [port, setPort] = useState(null);
@@ -326,7 +326,6 @@ function ConnectionForm({ isConnected, setIsConnected,
 
   return (
     <>
-      <div ><h2 style={{ textAlign: 'center' }}>Connection</h2></div>
       <div>
 
 
@@ -378,20 +377,42 @@ function ConnectionForm({ isConnected, setIsConnected,
             </div>
           </div>
         </form>
-        <select
-          id="instrument"
-          className="form-select"
-          onChange={(e) => setSelectedWavelength(Number(e.target.value))}
-        >
-          <option value='0' >ADC0/F1</option>
-          <option value='1'>415nm</option>
-          <option value='2'>445nm</option>
-          <option value='3'>480nm</option>
-          <option value='4'>515nm</option>
-          <option value='5'>555nm</option>
-          <option value='6'>630nm</option>
-          <option value='8'>NIR</option>
-        </select>
+
+        <div className='input-container'>
+          <div className=" width50 ">
+            <label className="form-label mb-0 ">Comprimento de onda</label>
+            <select
+              id="instrument"
+              className="form-select"
+              onChange={(e) => setSelectedWavelength(Number(e.target.value))}
+            >
+              <option value='0' >ADC0/F1</option>
+              <option value='1'>415nm</option>
+              <option value='2'>445nm</option>
+              <option value='3'>480nm</option>
+              <option value='4'>515nm</option>
+              <option value='5'>555nm</option>
+              <option value='6'>630nm</option>
+              <option value='8'>NIR</option>
+            </select>
+          </div>
+          <div >
+            <label className="form-label mb-0 ">Mínimo Y</label>
+            <div className=" width50 ">
+              <input  onChange={(e) => setAxis([Number(e.target.value), axis[1]])} className='input-axis'></input>
+
+            </div>
+          </div>
+          <div >
+            <label className="form-label mb-0 ">Máximo Y</label>
+            <div className=" width50 ">
+              <input  onChange={(e) => setAxis([axis[0], Number(e.target.value)])} className='input-axis'></input>
+
+            </div>
+          </div>
+        </div>
+
+
         {/* <button
                 type="button"
                 onClick={() => handleExperimentStart()}

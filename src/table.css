@@ -2,7 +2,7 @@
 .scrollable-table table {
     width: 100%;
     text-align: center;
-    font-size: 15px;
+    font-size: 0.7rem;
     border-collapse: collapse;
 }
 
@@ -10,7 +10,7 @@
     background-color: white;
     position: sticky;
     top: 0;
-    font-size: 1.25rem;
+    font-size: 1rem;
 }
 
 .scrollable-table table tr td {
