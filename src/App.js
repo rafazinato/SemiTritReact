@@ -11,7 +11,7 @@ function App() {
   const [realTimeData, setRealTimeData] = useState([]);
   const [realTimeDataTable, setRealTimeDataTable] = useState([]);
   const [experimentDataTable, setExperimentDataTable] = useState([]);
-  const [experimentData, setExperimentData] = useState([]);
+
   const [derivativeData, setDerivativeData] = useState([]);
   const [testData, setTestData] = useState([])
   const [selectedWavelength, setSelectedWavelength] = useState()
@@ -44,6 +44,11 @@ function App() {
 
   const addTime = useRef(null)
   const [addTimeArray, setAddTimeArray] = useState([])
+
+  // Eixo X e Y para o Gráficos de Dados
+
+  const [experimentLabels, setExperimentLabels] = useState([])
+  const [experimentData, setExperimentData] = useState([]);
 
   // Função para adicionar dados em tempo real
   // const addRealTimeData = (data) => {
@@ -187,7 +192,20 @@ function App() {
   // console.log(addTimeArray)
   // console.log(maxPoints)
 
+  console.log(experimentLabels)
 
+  useEffect(() => {
+
+    if (experimentDataTable.length > 0) {
+      const nomes = experimentDataTable.map(item => item.Nome);
+      setExperimentLabels(nomes);
+      const numbers = experimentDataTable.map(item => item.Read);
+      setExperimentData(numbers)
+    }
+
+
+
+  }, [experimentDataTable]);
 
   function handleAddButton() {
     setAditionConc([...aditionConc, lastAditionConc])
@@ -208,7 +226,7 @@ function App() {
     startTime.current = Date.now()
   }
 
-
+  console.log(experimentDataTable)
   function handleInstruction() {
     
     return (
@@ -285,8 +303,8 @@ function App() {
           </button>
         </div>
         <div className="experiment-chart">
-          <h5 className="text-center">Curva analítica</h5>
-          <ExperimentChart data={maxPointArray} />
+          <h5 className="text-center">Dados Experimentais</h5>
+          <ExperimentChart data={experimentDataTable} experimentLabels={experimentLabels} experimentData={experimentData} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">

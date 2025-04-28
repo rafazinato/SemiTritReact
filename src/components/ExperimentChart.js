@@ -1,22 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
 
-function ExperimentChart({ data }) {
+function ExperimentChart({ data,experimentLabels,experimentData }) {
   const chartRef = useRef(null);
-
+  console.log(data)
   useEffect(() => {
     const ctx = chartRef.current.getContext('2d');
     const chart = new Chart(ctx, {
-      type: 'scatter',
+      type: 'line',
       data: {
+        labels: experimentLabels,
         datasets: [{
           label: 'Experiment Data',
-          data: data,
+          data: experimentData,
           backgroundColor: 'rgba(255, 99, 132, 1)',
           borderColor: 'rgba(255, 99, 132, 1)',
-          showLine: true,
+          showLine: false,
           borderWidth: 1,
-          pointRadius: 2,
+          pointRadius: 4,
         }],
       },
       options: {
@@ -27,21 +28,21 @@ function ExperimentChart({ data }) {
           }
         },
         scales: {
-          x: {
-             title: { display: true, text: 'Tempo',font: { size: 17} }, 
-             ticks: {
-              callback: function(value) {
-                return value / 1000 + 's'; // Converte ms para segundos
-              }
-            },
-            },
+          // x: {
+          //    title: { display: true, text: 'Tempo',font: { size: 17} }, 
+          //    ticks: {
+          //     callback: function(value) {
+          //       return value / 1000 + 's'; // Converte ms para segundos
+          //     }
+          //   },
+          //   },
           y: { title: { display: true, text: 'Sinal',font: { size: 17} },  },
         },
       },
     });
 
     return () => chart.destroy(); // Limpar gráfico ao desmontar
-  }, [data]);
+  }, [data,experimentLabels]);
 
   return (
     <div >
