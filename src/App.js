@@ -21,7 +21,7 @@ function App() {
 
   // State que controlará mínimo e máximo do gráfico Real
 
-  const [axis, setAxis] = useState([0,65000]);
+  const [axis, setAxis] = useState([0,65700]);
 
   // State que controlará o aparecimento das instruções
 
@@ -89,7 +89,7 @@ function App() {
   }, [experimentData]);
 
   useEffect(() => {
-    setRealTimeDataTable(filteredData.map((e) => ({ 'Time': (e.x / 1000).toFixed(1), 'Read': e.y, 'Selecionado': 0 })))
+    setRealTimeDataTable(filteredData.map((e) => ({ 'Time': (e.x / 1000).toFixed(1), 'Read': e.y, 'Selecionado': maxPointArray.some(item => item.x === e.x && item.y === e.y) ? 1 : 0 })))
   }, [filteredData]);
 
   useEffect(() => {
@@ -179,18 +179,15 @@ function App() {
 
 
     // setMaxPointArray([...maxPointArray, maxPoint ])
-    console.log(maxPointArray)
+    // console.log(maxPointArray)
   }, [maxPoint, addTimeArray, filteredData]);
 
 
-  console.log(labelTable)
+
   // console.log(addTimeArray)
   // console.log(maxPoints)
 
 
-  // function dealTableTest() {
-  //   setRealTimeData([...realTimeData, {  Time: '10:00', Read: 1.2, pH: 7.0, Temperature: 25.0 }])
-  // }
 
   function handleAddButton() {
     setAditionConc([...aditionConc, lastAditionConc])
@@ -203,6 +200,7 @@ function App() {
 
 
   function handleClearData() {
+    setMaxPointArray([])
     setTestData([])
     setFilteredData([])
     setRealTimeData([])
@@ -210,12 +208,12 @@ function App() {
     startTime.current = Date.now()
   }
 
-  console.log(axis)
+
   function handleInstruction() {
     
     return (
       <>
-        <p class="mb-3 text-center">This page is designed for acquiring data from lab instruments via RS232/USB ports. While it is primarily intended for titration data acquisition, it can also be used for other types of data collection.        </p>
+        <p class="mb-3 text-center">This page is designed for acquiring data from lab instruments via RS232/USB ports.        </p>
         <p class=" my-1 ">1) Ensure your lab instrument is connected to your computer's USB port.</p>
         <p class=" my-1">2) Choose the appropriate instrument profile from the dropdown menu.</p>
         <p class=" my-1">3) Click the <strong>Connect</strong> button to establish a connection with the instrument.</p>
@@ -257,7 +255,7 @@ function App() {
 
           </div>
           <div class="col-md-5 mb-3 instructions">
-            <h5 class="text-center"><button class='btn btn-info' onClick={() => setShowInstruction(!showInstruction)}>Instructions for Data Acquisition from Lab Instrumentation</button></h5>
+            <h5 class="text-center"><button class='btn btn-info' onClick={() => setShowInstruction(!showInstruction)}>Instruções para aquisição de dados</button></h5>
               {showInstruction ? handleInstruction() : null }
           </div>
         </div>
@@ -288,7 +286,7 @@ function App() {
         </div>
         <div className="experiment-chart">
           <h5 className="text-center">Curva analítica</h5>
-          <ExperimentChart data={experimentData} />
+          <ExperimentChart data={maxPointArray} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
@@ -330,7 +328,6 @@ function App() {
           </button>
         </div>
       </div>
-      {/* <button onClick={() => dealTableTest()}>teste tabela</button> */}
     </div>
 
   );

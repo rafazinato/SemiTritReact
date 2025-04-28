@@ -11,7 +11,7 @@ function ExperimentChart({ data }) {
       data: {
         datasets: [{
           label: 'Experiment Data',
-          data: data.map((d) => ({ x: d.volume, y: d.pH })),
+          data: data,
           backgroundColor: 'rgba(255, 99, 132, 1)',
           borderColor: 'rgba(255, 99, 132, 1)',
           showLine: true,
@@ -20,13 +20,21 @@ function ExperimentChart({ data }) {
         }],
       },
       options: {
+        animation: false,
         plugins: {
           legend: {
             display: false, // Ocultar legenda
           }
         },
         scales: {
-          x: { title: { display: true, text: 'Volume',font: { size: 17} },  },
+          x: {
+             title: { display: true, text: 'Tempo',font: { size: 17} }, 
+             ticks: {
+              callback: function(value) {
+                return value / 1000 + 's'; // Converte ms para segundos
+              }
+            },
+            },
           y: { title: { display: true, text: 'Sinal',font: { size: 17} },  },
         },
       },

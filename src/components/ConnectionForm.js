@@ -332,7 +332,7 @@ function ConnectionForm({ isConnected, setIsConnected,
         <form id="connection-form">
           <div className="row g-2 mb-2 align-items-center">
             <div className="col-md-5">
-              <label htmlFor="instrument" className="form-label mb-0">Instrument</label>
+              <label htmlFor="instrument" className="form-label mb-0">Instrumento</label>
               <select
                 id="instrument"
                 className="form-select"
@@ -346,7 +346,7 @@ function ConnectionForm({ isConnected, setIsConnected,
               </select>
             </div>
             <div className="col-md-4">
-              <label htmlFor="read-interval" className="form-label mb-0">Read Interval</label>
+              <label htmlFor="read-interval" className="form-label mb-0">Intervalo de Leitura</label>
               <select
                 id="read-interval"
                 className="form-select"
@@ -366,13 +366,13 @@ function ConnectionForm({ isConnected, setIsConnected,
             <div className="col-md-3">
               <button
                 type="button"
-                className={getButtonClass(isConnected)}
+                className='btnc btn-connnect'
                 onClick={() => handleConnection()}
               // onClick={
               //   toggleConnection
               // }
               >
-                {isConnected ? 'Disconnect' : 'Connect'}
+                {isConnected ? 'Desconectar' : 'Conectar'}
               </button>
             </div>
           </div>
