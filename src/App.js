@@ -19,9 +19,12 @@ function App() {
   const startTime = useRef(null)
   const [filteredData, setFilteredData] = useState([]);
 
+
+
+
   // State que controlará mínimo e máximo do gráfico Real
 
-  const [axis, setAxis] = useState([0,65700]);
+  const [axis, setAxis] = useState([0, 65700]);
 
   // State que controlará o aparecimento das instruções
 
@@ -50,6 +53,10 @@ function App() {
   const [experimentLabels, setExperimentLabels] = useState([])
   const [experimentData, setExperimentData] = useState([]);
 
+  // State que apresentará os nomes da coluna 1
+
+  const [columsTable1, setColumsTable1] = useState([])
+  const [columsTable2, setColumsTable2] = useState([])
   // Função para adicionar dados em tempo real
   // const addRealTimeData = (data) => {
   //   setRealTimeData((prevData) => [...prevData, data]);
@@ -61,20 +68,20 @@ function App() {
   };
 
   // Função para calcular e atualizar dados da derivada
-  const updateDerivativeData = () => {
-    if (experimentData.length < 2) return;
-    const newDerivativeData = [];
-    for (let i = 1; i < experimentData.length; i++) {
-      const volume1 = experimentData[i - 1].volume;
-      const volume2 = experimentData[i].volume;
-      const pH1 = experimentData[i - 1].pH;
-      const pH2 = experimentData[i].pH;
-      const averageVolume = (volume1 + volume2) / 2;
-      const derivativeValue = ((pH2 - pH1) / (volume2 - volume1) * 1000);
-      newDerivativeData.push({ averageVolume, derivativeValue });
-    }
-    setDerivativeData(newDerivativeData);
-  };
+  // const updateDerivativeData = () => {
+  //   if (experimentData.length < 2) return;
+  //   const newDerivativeData = [];
+  //   for (let i = 1; i < experimentData.length; i++) {
+  //     const volume1 = experimentData[i - 1].volume;
+  //     const volume2 = experimentData[i].volume;
+  //     const pH1 = experimentData[i - 1].pH;
+  //     const pH2 = experimentData[i].pH;
+  //     const averageVolume = (volume1 + volume2) / 2;
+  //     const derivativeValue = ((pH2 - pH1) / (volume2 - volume1) * 1000);
+  //     newDerivativeData.push({ averageVolume, derivativeValue });
+  //   }
+  //   setDerivativeData(newDerivativeData);
+  // };
 
   // Função para download de dados em CSV
   const downloadCSV = (dataArray, filename, headers) => {
@@ -89,16 +96,30 @@ function App() {
     document.body.removeChild(link);
   };
 
-  useEffect(() => {
-    updateDerivativeData();
-  }, [experimentData]);
+  // useEffect(() => {
+  //   updateDerivativeData();
+  // }, [experimentData]);
 
   useEffect(() => {
-    setRealTimeDataTable(filteredData.map((e) => ({ 'Time': (e.x / 1000).toFixed(1), 'Read': e.y, 'Selecionado': maxPointArray.some(item => item.x === e.x && item.y === e.y) ? 1 : 0 })))
+
+    let read1 = columsTable1[1]
+    let read2 = columsTable1[2]
+    let read3 = columsTable1[3]
+
+
+    let a = filteredData.map((e) => ({ 'Time': (e.x / 1000).toFixed(1), [read1]: e.y[0], [read2]: e.y[1], [read3]: e.y[2], 'Selecionado': maxPointArray.some(item => item.x === e.x && item.y === e.y) ? 1 : 0 }))
+
+    setRealTimeDataTable(a)
   }, [filteredData]);
 
+
+
   useEffect(() => {
-    setExperimentDataTable(maxPointArray.map((e, idx) => ({ 'Nome': labelTable[idx], 'Read': e.y, })))
+    let read1 = columsTable1[1]
+    let read2 = columsTable1[2]
+    let read3 = columsTable1[3]
+
+    setExperimentDataTable(maxPointArray.map((e, idx) => ({ 'Nome': labelTable[idx], [read1]: e.y[0], [read2]: e.y[1], [read3]: e.y[2] })))
   }, [maxPointArray]);
 
 
@@ -113,7 +134,6 @@ function App() {
     // const maxTimestamp = Math.max(...addTimeArray);
     // let biggertimes = filteredData.filter(e => e.x > maxTimestamp);
 
-    // console.log(biggertimes)
 
     if (addTimeArray.length === 0) return;
     const lastTime = addTimeArray[addTimeArray.length - 1];
@@ -126,9 +146,6 @@ function App() {
     setMaxPoint(Math.max(...newDataAfterClick.map(o => o.y)))
 
 
-    // console.log(lastTime - startTime.current)
-    // console.log(addTimeArray)
-    // console.log(newDataAfterClick)
 
 
 
@@ -141,12 +158,11 @@ function App() {
     let dataInTime;
     addTimeArray.forEach((e, idx) => {
       // if (addTimeArray[idx - 1 ] === undefined) {
-      //   console.log('a')
+
       //   //  dataInTime = filteredData.filter( point => point.x >=  e - startTime.current )
       //   //  setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
       // } else {
       //   dataInTime = filteredData.filter( point => point.x <=  e - startTime.current && point.x >= addTimeArray[idx-1]  - startTime.current)
-      //   console.log(dataInTime)
       //   setMaxPointArray([...maxPointArray, Math.max(...dataInTime.map(o => o.y))])
       // }
       if (addTimeArray.length === 1) {
@@ -192,7 +208,58 @@ function App() {
   // console.log(addTimeArray)
   // console.log(maxPoints)
 
-  console.log(experimentLabels)
+  useEffect(() => {
+    let colunm = ["Time"];
+    let colunm2 = ["Nome"]
+
+    if (filteredData && filteredData[0] !== undefined && filteredData[0].y) {
+      const wave_numbers = filteredData[0].y.length;
+
+      for (let index = 0; index < wave_numbers; index++) {
+        let label = "Nenhum"; // Default value
+
+        if (selectedWavelength && selectedWavelength[0] !== undefined) {
+          switch (selectedWavelength[index]) {
+            case 0:
+              label = "ADC0/F1";
+              break;
+            case 1:
+              label = "415nm";
+              break;
+            case 2:
+              label = "445nm";
+              break;
+            case 3:
+              label = "480nm";
+              break;
+            case 4:
+              label = "515nm";
+              break;
+            case 5:
+              label = "555nm";
+              break;
+            case 6:
+              label = "630nm";
+              break;
+            case 8:
+              label = "NIR";
+              break;
+            default:
+              label = "Nenhum";
+              break;
+          }
+        }
+        colunm.push(label);
+        colunm2.push(label)
+      }
+    }
+
+    colunm.push("Selecionado");
+    setColumsTable1(colunm);
+    setColumsTable2(colunm2)
+  }, [filteredData]); // Added selectedWavelength to dependencies
+
+
 
   useEffect(() => {
 
@@ -200,12 +267,17 @@ function App() {
       const nomes = experimentDataTable.map(item => item.Nome);
       setExperimentLabels(nomes);
       const numbers = experimentDataTable.map(item => item.Read);
-      setExperimentData(numbers)
+      // setExperimentData(maxPointArray.map((e) => e.y))
+      setExperimentData(maxPointArray)
+
     }
 
 
 
   }, [experimentDataTable]);
+
+  console.log(experimentData)
+  console.log(maxPointArray)
 
   function handleAddButton() {
     setAditionConc([...aditionConc, lastAditionConc])
@@ -226,9 +298,8 @@ function App() {
     startTime.current = Date.now()
   }
 
-  console.log(experimentDataTable)
   function handleInstruction() {
-    
+
     return (
       <>
         <p class="mb-3 text-center">This page is designed for acquiring data from lab instruments via RS232/USB ports.        </p>
@@ -248,7 +319,7 @@ function App() {
 
       <div className="row mb-2 g-2">
         <div className='menu-container'>
-         
+
           <div className="col-md-7">
             <ConnectionForm
               isConnected={isConnected}
@@ -274,14 +345,14 @@ function App() {
           </div>
           <div class="col-md-5 mb-3 instructions">
             <h5 class="text-center"><button class='btn btn-info' onClick={() => setShowInstruction(!showInstruction)}>Instruções para aquisição de dados</button></h5>
-              {showInstruction ? handleInstruction() : null }
+            {showInstruction ? handleInstruction() : null}
           </div>
         </div>
       </div>
       <div className="graph-container">
         <div className="real-chart">
           <h5 className="text-center">Real-Time Data</h5>
-          <RealTimeChart data={filteredData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints} axis={axis} />
+          <RealTimeChart data={filteredData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints} axis={axis} selectedWavelength={selectedWavelength} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
@@ -293,10 +364,10 @@ function App() {
               <button type="button" id="clear-data-button" class="btn btn-danger full-width-button" onClick={() => handleClearData()}>Clear Data</button>
             </div>
           </div>
-          <DataTable data={realTimeDataTable} columns={['Time', 'Read', 'Selecionado']} />
+          <DataTable data={realTimeDataTable} columns={columsTable1} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
-            onClick={() => downloadCSV(realTimeDataTable, 'real-time_data.csv', ['Time', 'Read', 'Selecionado'])}
+            onClick={() => downloadCSV(realTimeDataTable, 'real-time_data.csv', columsTable1)}
             disabled={realTimeDataTable.length === 0}
           >
             Download Real-Time Data
@@ -304,7 +375,7 @@ function App() {
         </div>
         <div className="experiment-chart">
           <h5 className="text-center">Dados Experimentais</h5>
-          <ExperimentChart data={experimentDataTable} experimentLabels={experimentLabels} experimentData={experimentData} />
+          <ExperimentChart data={experimentDataTable} experimentLabels={experimentLabels} experimentData={experimentData} selectedWavelength={selectedWavelength} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
               <div class="label-container">
@@ -322,10 +393,10 @@ function App() {
             </div>
           </div>
 
-          <DataTable data={experimentDataTable} columns={["Nome", 'Read']} />
+          <DataTable data={experimentDataTable} columns={columsTable2} />
           <button
             className="btn btn-info mt-2 mb-2 full-width-button"
-            onClick={() => downloadCSV(experimentDataTable, 'experiment_data.csv', ["Nome", 'Read'])}
+            onClick={() => downloadCSV(experimentDataTable, 'experiment_data.csv', columsTable2)}
             disabled={experimentDataTable.length === 0}
           >
             Download Experiment Data

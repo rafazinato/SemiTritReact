@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../form.css';
+import Select from "react-select";
 function ConnectionForm({ isConnected, setIsConnected,
   addRealTimeData, setRealTimeData, realTimeData, setTestData,
   testData, selectedWavelength, setSelectedWavelength, chartPoints,
@@ -8,6 +9,7 @@ function ConnectionForm({ isConnected, setIsConnected,
   const [readInterval, setReadInterval] = useState(2000);
   const [port, setPort] = useState(null);
   const [intervalState, setIntervalState] = useState(1000)
+
 
   // const startTime = useRef(null)
   const deviceConfigs = {
@@ -146,10 +148,10 @@ function ConnectionForm({ isConnected, setIsConnected,
       const elapsedTime = currentStartTime ? Date.now() - currentStartTime.current : 0;
 
       // console.log(elapsedTime)
-      setRealTimeData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
-
-      // setRealTimeDataTable(prev => [...prev, { 'Time': (elapsedTime / 1000), 'Read': dataStr[selectedWavelength], 'Selecionado': 0 }])
-
+      // setRealTimeData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
+      if (selectedWavelength.length > 0) {
+        setRealTimeData(prev => [...prev, { x: elapsedTime, y: selectedWavelength.map((wave) => dataStr[wave]) }]);
+      }
 
 
 
@@ -324,6 +326,24 @@ function ConnectionForm({ isConnected, setIsConnected,
     return className;
   };
 
+  const waves = [
+    { value: '0', label: 'ADC0/F1' },
+    { value: '1', label: '415nm' },
+    { value: '2', label: '445nm' },
+    { value: '3', label: '480nm' },
+    { value: '4', label: '515nm' },
+    { value: '5', label: '555nm' },
+    { value: '6', label: '630nm' },
+    { value: '8', label: 'NIR' }
+  ]
+
+  function handleWavelenght(e) {
+    // setSelectedWavelength(e)
+    // const nomes = experimentDataTable.map(item => item.Nome);
+    // setExperimentLabels(nomes);
+    const indexs = e.map(item => Number(item.value))
+    setSelectedWavelength(indexs)
+  }
   return (
     <>
       <div>
@@ -381,10 +401,10 @@ function ConnectionForm({ isConnected, setIsConnected,
         <div className='input-container'>
           <div className=" width50 ">
             <label className="form-label mb-0 ">Comprimento de onda</label>
-            <select
+            {/* <select
               id="instrument"
               className="form-select"
-              onChange={(e) => setSelectedWavelength(Number(e.target.value))}
+              // onChange={(e) => setSelectedWavelength(Number(e.target.value))}
             >
               <option value='0' >ADC0/F1</option>
               <option value='1'>415nm</option>
@@ -394,7 +414,14 @@ function ConnectionForm({ isConnected, setIsConnected,
               <option value='5'>555nm</option>
               <option value='6'>630nm</option>
               <option value='8'>NIR</option>
-            </select>
+            </select> */}
+            <Select
+             isMulti
+             onChange={handleWavelenght}
+             options={waves}
+             />
+
+
           </div>
           <div >
             <label className="form-label mb-0 ">Mínimo Y</label>
