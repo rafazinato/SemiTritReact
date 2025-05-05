@@ -115,8 +115,8 @@ function ExperimentChart({ data, experimentLabels,experimentData,selectedWavelen
           {
           label: label1 ? label1 : " ",
           data: y1,
-          backgroundColor: 'rgba(75, 192, 192, 1)',
-          borderColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)', // Cor da linha
+          backgroundColor: 'rgba(75, 192, 192, 0.2)', // Cor de fundo
           showLine: false,
           borderWidth: 1,
           pointRadius: 4,
@@ -126,8 +126,8 @@ function ExperimentChart({ data, experimentLabels,experimentData,selectedWavelen
         {
           label: label2 ? label2 : " ",
           data: y2,
-          backgroundColor: 'rgb(192, 75, 192)',
-          borderColor: 'rgb(192, 75, 192,0.2)',
+          borderColor: 'rgb(192, 75, 192)', // Cor da linha
+          backgroundColor: 'rgb(192, 75, 192,0.2)', // Cor de fundo
           showLine: false,
           borderWidth: 1,
           pointRadius: 4,
@@ -137,8 +137,8 @@ function ExperimentChart({ data, experimentLabels,experimentData,selectedWavelen
         {
           label: label3 ? label3 : " ",
           data: y3,
-          backgroundColor: 'rgb(192, 83, 75)',
-          borderColor: 'rgb(192, 83, 75,0.2)',
+          borderColor: 'rgb(192, 83, 75)', // Cor da linha
+          backgroundColor: 'rgb(192, 83, 75,0.2)', // Cor de fundo
           showLine: false,
           borderWidth: 1,
           pointRadius: 4,

@@ -171,6 +171,7 @@ header h4 {
 } */
 
 .col-md-7 {
+  margin-left: 3rem;
   flex: 0 0 58.333333%;
   max-width: 58.333333%;
 }
@@ -292,12 +293,12 @@ header h4 {
 
 
 .real-chart {
-  width: 36.66666667%;
+  width: 40.66666667%;
 
 }
 
 .experiment-chart {
-  width: 36.66666667%;
+  width: 40.66666667%;
 }
 .derivative-chart {
   width: 21.66666667%; 

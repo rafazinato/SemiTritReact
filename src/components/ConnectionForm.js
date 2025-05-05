@@ -4,7 +4,7 @@ import Select from "react-select";
 function ConnectionForm({ isConnected, setIsConnected,
   addRealTimeData, setRealTimeData, realTimeData, setTestData,
   testData, selectedWavelength, setSelectedWavelength, chartPoints,
-  startTime, setFilteredData, filteredData, setRealTimeDataTable,setAxis,axis }) {
+  startTime, setFilteredData, filteredData, setRealTimeDataTable, setAxis, axis }) {
   const [instrument, setInstrument] = useState('lucadema210');
   const [readInterval, setReadInterval] = useState(2000);
   const [port, setPort] = useState(null);
@@ -359,10 +359,11 @@ function ConnectionForm({ isConnected, setIsConnected,
                 value={instrument}
                 onChange={(e) => setInstrument(e.target.value)}
               >
+                <option value='AS7341_FIA'>AS7341-FIA</option>
                 <option value='lucadema210' >Lucadema - LUCA210 - Escala pH</option>
                 <option value='phmeter'>pH Meter 2</option>
                 <option value='ADS_continous_Arduino'>ADS_continous-Arduino</option>
-                <option value='AS7341_FIA'>AS7341-FIA</option>
+
               </select>
             </div>
             <div className="col-md-4">
@@ -416,24 +417,24 @@ function ConnectionForm({ isConnected, setIsConnected,
               <option value='8'>NIR</option>
             </select> */}
             <Select
-             isMulti
-             onChange={handleWavelenght}
-             options={waves}
-             />
+              isMulti
+              onChange={handleWavelenght}
+              options={waves}
+            />
 
 
           </div>
           <div >
             <label className="form-label mb-0 ">Mínimo Y</label>
             <div className=" width50 ">
-              <input  onChange={(e) => setAxis([Number(e.target.value), axis[1]])} className='input-axis'></input>
+              <input onChange={(e) => setAxis([Number(e.target.value), axis[1]])} className='input-axis'></input>
 
             </div>
           </div>
           <div >
             <label className="form-label mb-0 ">Máximo Y</label>
             <div className=" width50 ">
-              <input  onChange={(e) => setAxis([axis[0], Number(e.target.value)])} className='input-axis'></input>
+              <input onChange={(e) => setAxis([axis[0], Number(e.target.value)])} className='input-axis'></input>
 
             </div>
           </div>

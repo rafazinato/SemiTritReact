@@ -302,12 +302,11 @@ function App() {
 
     return (
       <>
-        <p class="mb-3 text-center">This page is designed for acquiring data from lab instruments via RS232/USB ports.        </p>
-        <p class=" my-1 ">1) Ensure your lab instrument is connected to your computer's USB port.</p>
-        <p class=" my-1">2) Choose the appropriate instrument profile from the dropdown menu.</p>
-        <p class=" my-1">3) Click the <strong>Connect</strong> button to establish a connection with the instrument.</p>
-        <p class=" my-1">4) Define the Volume aliquot and Click <strong>Start</strong> to start the experiment.</p>
-        <p class=" my-1">5) Press the <strong>Add</strong> button to record the data point.</p>
+        <p class="mb-3 text-center">Esta página é projetada para aquisição de dados de instrumentos de laboratório via portas RS232/USB</p>
+        <p class=" my-1 ">1)Para realizar um experimento de injeção de fluxo, escolha o instrumento AS7341-FIA</p>
+        <p class=" my-1">2) Escollha os comprimentos de onda que serão analisados antes de fazer o experimento</p>
+        <p class=" my-1">3) Clique no botão <strong>Conectar</strong> para começar a leitura de dados</p>
+        <p class=" my-1">4) Após adição de um padrão ou alguma amostra, adicione um rótulo e clique no botão "Adicionar"</p>
       </>
     );
   }
@@ -351,7 +350,7 @@ function App() {
       </div>
       <div className="graph-container">
         <div className="real-chart">
-          <h5 className="text-center">Real-Time Data</h5>
+          <h5 className="text-center">Dados obtidos em tempo real</h5>
           <RealTimeChart data={filteredData} testData={testData} setSelectedWavelength={setSelectedWavelength} chartPoints={chartPoints} axis={axis} selectedWavelength={selectedWavelength} />
           <div class="row g-2 mb-2 align-items-center">
             <div class="col-md-8">
@@ -402,7 +401,7 @@ function App() {
             Download Experiment Data
           </button>
         </div>
-        <div className="derivative-chart">
+        {/* <div className="derivative-chart">
           <h5 className="text-center">Derivative</h5>
           <div style={{ justifyItems: 'center' }}>
             <DerivativeChart data={derivativeData} />
@@ -415,7 +414,7 @@ function App() {
           >
             Download Derivative Data
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
 
