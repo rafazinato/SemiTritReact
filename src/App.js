@@ -170,7 +170,7 @@ function App() {
 
       } else {
 
-        dataInTime = filteredData.filter(point => point.x <= e - startTime.current && point.x >= addTimeArray[idx - 1] - startTime.current)
+        dataInTime = filteredData.filter(point => point.x <= e - startTime.current && point.x >= addTimeArray[idx -1] - startTime.current)
 
       }
       // dataInTime = filteredData.filter( point => point.x <=  e - startTime.current && point.x >= addTimeArray[idx-1]  - startTime.current)
@@ -180,7 +180,8 @@ function App() {
 
       if (dataInTime.length !== 0) {
         const max = dataInTime.reduce(function (prev, current) {
-          return (prev && prev.y > current.y) ? prev : current
+          // obs, do jeito que está agora, ele só verifica o valor máximo do comprimento de onda inicial
+          return (prev && prev.y[0] > current.y[0]) ? prev : current
         }) //returns object
 
         const aa = [...maxPointArray, max]
@@ -276,8 +277,9 @@ function App() {
 
   }, [experimentDataTable]);
 
-  console.log(experimentData)
-  console.log(maxPointArray)
+  // console.log(experimentData)
+  // console.log(maxPointArray)
+  console.log(filteredData)
 
   function handleAddButton() {
     setAditionConc([...aditionConc, lastAditionConc])
