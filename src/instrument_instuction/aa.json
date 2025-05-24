@@ -1,0 +1,8 @@
+{
+    "name" : "novoDispositivo",
+    "baudRate" : 115200,
+    "dataBits" : 8,
+    "stopBits": 1, 
+    "parity" : "none"
+}
+

@@ -10,9 +10,14 @@ function ConnectionForm({ isConnected, setIsConnected,
   const [port, setPort] = useState(null);
   const [intervalState, setIntervalState] = useState(1000)
 
+  const [file, setFile] = useState(null)
+
+  const [userDeviceConfig, setUserDeviceConfig] = useState(null); // novo
+
+
 
   // const startTime = useRef(null)
-  const deviceConfigs = {
+  let deviceConfigs = {
     lucadema210: {
       name: "Lucadema - LUCA210 - Escala pH",
       baudRate: 9600,
@@ -40,15 +45,20 @@ function ConnectionForm({ isConnected, setIsConnected,
       dataBits: 8,
       stopBits: 1,
       parity: "none",
-    }
+    },
+    novoDispositivo: {
+      name: "novoDispositivo",
+      baudRate: 115200,
+      dataBits: 8,
+      stopBits: 1,
+      parity: "none",
+    },
+
+
   };
 
   let reader;
-  let lastValidData = null
-  let updateTimer;
-  let experimentData = [], derivativeData = []; // Data arrays
   let buffer = [];
-  let volumeSum = 0, readCount = 0, experimentReadCount = 0; // Counters
   const toggleConnection = async () => {
     if (isConnected) {
       await disconnect();
@@ -65,9 +75,13 @@ function ConnectionForm({ isConnected, setIsConnected,
     parity: deviceConfigs[instrument].parity
   };
 
+
+
+
   const connect = async () => {
     try {
       const port = await navigator.serial.requestPort();
+      console.log(serialOptions)
       await port.open(serialOptions);
       reader = port.readable.getReader();
       setIsConnected(true);
@@ -124,11 +138,42 @@ function ConnectionForm({ isConnected, setIsConnected,
       console.error("Failed to read data:", err);
     }
   }
-  const [localData, setLocalData] = useState([]);
+  console.log(deviceConfigs[instrument].name)
   let data = [];
   let data_teste;
   function dealDataStr(dataStr, startTime) {
     if (deviceConfigs[instrument].name == "AS7341-FIA") {
+      dataStr = dataStr.split(';')
+      dataStr = dataStr.map((e) => Number(e))
+      dataStr = dataStr.filter(item => !Number.isNaN(item));
+      data.push({ x: Date.now(), y: dataStr[selectedWavelength] })
+
+      // data_teste = data.map((e,idx) => ({ x: time[idx], read: e }));
+
+      // setLocalData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
+
+
+
+
+      // setTestData(prev => [...prev, { x: Date.now(), y: dataStr[selectedWavelength] }]);
+
+      const currentStartTime = startTime; // Captura o valor mais recente
+      // console.log(currentStartTime)
+      const elapsedTime = currentStartTime ? Date.now() - currentStartTime.current : 0;
+
+      // console.log(elapsedTime)
+      // setRealTimeData(prev => [...prev, { x: elapsedTime, y: dataStr[selectedWavelength] }]);
+      if (selectedWavelength.length > 0) {
+        setRealTimeData(prev => [...prev, { x: elapsedTime, y: selectedWavelength.map((wave) => dataStr[wave]) }]);
+      }
+
+
+
+    }
+
+    if (deviceConfigs['novoDispositivo'].name == "novoDispositivo") {
+
+      console.log("aaaa")
       dataStr = dataStr.split(';')
       dataStr = dataStr.map((e) => Number(e))
       dataStr = dataStr.filter(item => !Number.isNaN(item));
@@ -209,122 +254,11 @@ function ConnectionForm({ isConnected, setIsConnected,
 
   }
 
-  // function filterData(data, interval) {
-  //     if (!data || data.length === 0 || !interval) return [];
-
-  //     const result = [];
-  //     let nextIntervalPoint = interval; // Start with the first interval
-
-  //     // Find the first data point after the first interval
-  //     for (let i = 0; i < data.length; i++) {
-  //       if (data[i].x>= nextIntervalPoint) {
-  //         result.push(data[i]);
-  //         nextIntervalPoint += interval; // Move to next interval
-  //       }
-  //     }
-
-  //     return result;
-  //   }
-
-
-  // useEffect(() => {
-  //   setTestData(testData.slice(-chartPoints))
-  // }, [chartPoints]);
-
-
-  // useEffect(() => {
-  //   if (startTime ==) {
-
-  //   }
-  // }, [startTime]);
-
-  // let rawBuffer = '';
-
-  // async function readSerialData() {
-  //   try {
-  //     while (true) {
-  //       const { value, done } = await reader.read();
-  //       if (done) {
-  //         console.log("Leitura concluída");
-  //         return;
-  //       }
-
-  //       const chunk = new TextDecoder().decode(value);
-  //       rawBuffer += chunk;
-  //       console.log("Dado bruto recebido:", chunk);
-
-  //       // Processa todos os valores completos (separados por ;)
-  //       let parts = rawBuffer.split(';');
-
-  //       // Mantém o último fragmento incompleto no buffer
-  //       rawBuffer = parts.pop() || '';
-
-  //       // Filtra valores vazios e converte para números
-  //       let values = parts.filter(val => val.trim() !== '').map(Number);
-
-  //       // Adiciona os valores processados ao buffer
-  //       if (values.length > 0) {
-  //         buffer.push(...values);
-  //         console.log("Valores processados:", values);
-  //       }
-
-  //       // Quando temos 10 valores, processamos como uma leitura completa
-  //       while (buffer.length >= 10) {
-  //         const reading = buffer.slice(0, 10);
-  //         buffer = buffer.slice(10);
-  //         console.log("Leitura completa (10 valores):", reading);
-  //         // Aqui você pode usar a leitura completa (10 valores)
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("Erro na leitura:", err);
-  //   }
-  // }
-
-  // readSerialData().catch(console.error);
-
-  // function parseData(dataStr) {
-  //   const parts = dataStr.split(','); // Split data string into parts
-  //   if (parts.length !== 2) return null; // Ensure data is valid
-
-  //   const pH = parseFloat(parts[0]); // Parse pH value
-  //   const temperature = parseFloat(parts[1]).toFixed(1); // Parse and format temperature
-  //   if (isNaN(pH) || pH < 1 || pH > 14 || isNaN(temperature)) return null; // Validate data
-
-  //   return { pH, temperature }; // Return parsed data
-  // }
-
-  // function updateReadInterval() {
-  //   clearInterval(updateTimer); // Clear any existing update timer
-  //   const readInterval = parseInt(readInterval); // Get selected interval
-  //   updateTimer = setInterval(updateRealTimeData, readInterval); // Set a new interval
-  //   updateRealTimeData(); // Update real-time data immediately
-
-  // }
-
-  function updateRealTimeData() {
-    if (!lastValidData) return; // Exit if no valid data available
-
-    const data = { ...lastValidData, ...getCurrentDateTime(), read: ++readCount }; // Create a new data point
-    realTimeData.push(data); // Add to real-time data array
-    setRealTimeData(realTimeData)
-
-  }
 
   function getCurrentDateTime() {
     const now = new Date();
     return { date: now.toLocaleDateString(), time: now.toLocaleTimeString() }; // Return formatted date and time
   }
-
-  const getButtonClass = (isConnected) => {
-    let className = 'btn full-width-button btn-success ';
-    if (isConnected) {
-      className = ' btn full-width-button btn-warning';
-    } else {
-      className = 'btn full-width-button btn-success';
-    }
-    return className;
-  };
 
   const waves = [
     { value: '0', label: 'ADC0/F1' },
@@ -344,6 +278,65 @@ function ConnectionForm({ isConnected, setIsConnected,
     const indexs = e.map(item => Number(item.value))
     setSelectedWavelength(indexs)
   }
+
+    // novoDispositivo: {
+    //   name: "",
+    //   baudRate: 115200,
+    //   dataBits: 8,
+    //   stopBits: 1,
+    //   parity: "none",
+    // },
+
+  function useJSONUser() {
+    // deviceConfigs.novoDispositivo = file
+    deviceConfigs.novoDispositivo = {
+      ...deviceConfigs.novoDispositivo, 
+      name: file.name,   
+      baudRate: file.baudRate,
+      dataBits : file.dataBits,   
+      stopBits: file.stopBits,             
+      parity: file.parity,               
+    };
+
+    console.log(deviceConfigs)
+    // setInstrument("novoDispositivo")
+
+  }
+
+  function handleFile(e) {
+    const file = e.target?.files?.[0];
+
+
+    if (file && file.type === "application/json") {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          const result = JSON.parse(e.target.result);
+          // const newKey = "userCustomDevice";
+          // deviceConfigs[newKey] = result; // adiciona ao objeto de configs
+          // setInstrument(newKey);          // agora instrument é "userCustomDevice"
+
+          setFile(result); // Aqui você pode usar os dados como quiser
+          console.log("JSON carregado:", result);
+        } catch (error) {
+          console.error("Erro ao fazer parse do JSON:", error);
+        }
+      };
+
+      reader.readAsText(file);
+    } else {
+      alert("Por favor, selecione um arquivo JSON válido.");
+    }
+  }
+
+
+  if (file) {
+
+    console.log(file);
+  }
+
+
   return (
     <>
       <div>
@@ -363,6 +356,7 @@ function ConnectionForm({ isConnected, setIsConnected,
                 <option value='lucadema210' >Lucadema - LUCA210 - Escala pH</option>
                 <option value='phmeter'>pH Meter 2</option>
                 <option value='ADS_continous_Arduino'>ADS_continous-Arduino</option>
+                <option value="novoDispositivo">Dispositivo Personalizado (JSON)</option>
 
               </select>
             </div>
@@ -437,6 +431,10 @@ function ConnectionForm({ isConnected, setIsConnected,
               <input onChange={(e) => setAxis([axis[0], Number(e.target.value)])} className='input-axis'></input>
 
             </div>
+          </div>
+          <div>
+            <input type='file' onChange={(e) => handleFile(e)} />
+            <button onClick={useJSONUser}>Usar JSON</button>
           </div>
         </div>
 

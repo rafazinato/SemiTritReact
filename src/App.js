@@ -279,7 +279,7 @@ function App() {
 
   // console.log(experimentData)
   // console.log(maxPointArray)
-  console.log(filteredData)
+  // console.log(filteredData)
 
   function handleAddButton() {
     setAditionConc([...aditionConc, lastAditionConc])
